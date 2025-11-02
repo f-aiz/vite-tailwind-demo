@@ -1,0 +1,29 @@
+[
+  {
+    "store_id":"STR-001",
+    "store_name":"Phoenix MarketCity Flagship",
+    "store_type":"Flagship",
+    "performance_tier":"A",
+    "sq_ft":12000,
+    "avg_basket_size":2200,
+    "location":"Whitefield, Bangalore"
+  },
+  {
+    "store_id":"STR-002",
+    "store_name":"Koramangala Neighborhood Store",
+    "store_type":"Neighborhood",
+    "performance_tier":"C",
+    "sq_ft":4500,
+    "avg_basket_size":1100,
+    "location":"Koramangala, Bangalore"
+  },
+  {
+    "store_id":"STR-003",
+    "store_name":"Indiranagar Mall Outlet",
+    "store_type":"Mall Outlet",
+    "performance_tier":"B",
+    "sq_ft":6000,
+    "avg_basket_size":1600,
+    "location":"Indiranagar, Bangalore"
+  }
+]

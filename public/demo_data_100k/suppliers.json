@@ -1,0 +1,272 @@
+[
+  {
+    "supplier_id":"SUP-001",
+    "supplier_name":"Kennedy LLC",
+    "return_window_days":60,
+    "avg_delivery_time_days":5,
+    "on_time_delivery_pct":0.97,
+    "quality_rating":4.9,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-002",
+    "supplier_name":"Garcia Inc",
+    "return_window_days":90,
+    "avg_delivery_time_days":8,
+    "on_time_delivery_pct":0.97,
+    "quality_rating":4.1,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-003",
+    "supplier_name":"Nolan Ltd",
+    "return_window_days":90,
+    "avg_delivery_time_days":8,
+    "on_time_delivery_pct":0.94,
+    "quality_rating":3.8,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-004",
+    "supplier_name":"Lewis-Perez",
+    "return_window_days":90,
+    "avg_delivery_time_days":4,
+    "on_time_delivery_pct":0.95,
+    "quality_rating":3.5,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-005",
+    "supplier_name":"Miller, Parker and Strong",
+    "return_window_days":90,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.97,
+    "quality_rating":4.7,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-006",
+    "supplier_name":"Miller PLC",
+    "return_window_days":90,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.94,
+    "quality_rating":4.3,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-007",
+    "supplier_name":"Martinez LLC",
+    "return_window_days":90,
+    "avg_delivery_time_days":4,
+    "on_time_delivery_pct":0.96,
+    "quality_rating":4.8,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-008",
+    "supplier_name":"Smith Inc",
+    "return_window_days":90,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.91,
+    "quality_rating":4.5,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-009",
+    "supplier_name":"Hernandez-Davis",
+    "return_window_days":30,
+    "avg_delivery_time_days":6,
+    "on_time_delivery_pct":0.82,
+    "quality_rating":4.2,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-010",
+    "supplier_name":"Flores, Vaughan and White",
+    "return_window_days":30,
+    "avg_delivery_time_days":5,
+    "on_time_delivery_pct":0.84,
+    "quality_rating":4.2,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-011",
+    "supplier_name":"Arvind Textiles",
+    "return_window_days":60,
+    "avg_delivery_time_days":8,
+    "on_time_delivery_pct":0.82,
+    "quality_rating":4.1,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-012",
+    "supplier_name":"Fleming Ltd",
+    "return_window_days":30,
+    "avg_delivery_time_days":13,
+    "on_time_delivery_pct":0.88,
+    "quality_rating":4.4,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-013",
+    "supplier_name":"Williams and Sons",
+    "return_window_days":30,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.81,
+    "quality_rating":4.2,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-014",
+    "supplier_name":"Wheeler Inc",
+    "return_window_days":45,
+    "avg_delivery_time_days":5,
+    "on_time_delivery_pct":0.85,
+    "quality_rating":4.4,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-015",
+    "supplier_name":"Bush Inc",
+    "return_window_days":30,
+    "avg_delivery_time_days":7,
+    "on_time_delivery_pct":0.81,
+    "quality_rating":4.2,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-016",
+    "supplier_name":"Sony India",
+    "return_window_days":45,
+    "avg_delivery_time_days":11,
+    "on_time_delivery_pct":0.89,
+    "quality_rating":4.2,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-017",
+    "supplier_name":"Williams-Robinson",
+    "return_window_days":45,
+    "avg_delivery_time_days":7,
+    "on_time_delivery_pct":0.85,
+    "quality_rating":3.8,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-018",
+    "supplier_name":"Walton and Sons",
+    "return_window_days":45,
+    "avg_delivery_time_days":8,
+    "on_time_delivery_pct":0.81,
+    "quality_rating":3.8,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-019",
+    "supplier_name":"Davis-Herman",
+    "return_window_days":45,
+    "avg_delivery_time_days":3,
+    "on_time_delivery_pct":0.88,
+    "quality_rating":4.6,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-020",
+    "supplier_name":"Oneal and Sons",
+    "return_window_days":30,
+    "avg_delivery_time_days":8,
+    "on_time_delivery_pct":0.81,
+    "quality_rating":3.6,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-021",
+    "supplier_name":"Bennett-Cook",
+    "return_window_days":45,
+    "avg_delivery_time_days":5,
+    "on_time_delivery_pct":0.84,
+    "quality_rating":4.4,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-022",
+    "supplier_name":"Yang-Valenzuela",
+    "return_window_days":30,
+    "avg_delivery_time_days":14,
+    "on_time_delivery_pct":0.83,
+    "quality_rating":4.3,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-023",
+    "supplier_name":"Samsung India",
+    "return_window_days":45,
+    "avg_delivery_time_days":9,
+    "on_time_delivery_pct":0.84,
+    "quality_rating":3.9,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-024",
+    "supplier_name":"Little-Carter",
+    "return_window_days":15,
+    "avg_delivery_time_days":9,
+    "on_time_delivery_pct":0.77,
+    "quality_rating":4.0,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-025",
+    "supplier_name":"Stark Inc",
+    "return_window_days":15,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.71,
+    "quality_rating":5.0,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-026",
+    "supplier_name":"Watts PLC",
+    "return_window_days":15,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.73,
+    "quality_rating":4.1,
+    "payment_terms":"NET 60"
+  },
+  {
+    "supplier_id":"SUP-027",
+    "supplier_name":"Rose-Johnson",
+    "return_window_days":15,
+    "avg_delivery_time_days":9,
+    "on_time_delivery_pct":0.7,
+    "quality_rating":4.2,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-028",
+    "supplier_name":"Blackwell-Roberson",
+    "return_window_days":30,
+    "avg_delivery_time_days":10,
+    "on_time_delivery_pct":0.72,
+    "quality_rating":4.9,
+    "payment_terms":"NET 45"
+  },
+  {
+    "supplier_id":"SUP-029",
+    "supplier_name":"Evans, Warren and Golden",
+    "return_window_days":15,
+    "avg_delivery_time_days":6,
+    "on_time_delivery_pct":0.77,
+    "quality_rating":4.3,
+    "payment_terms":"NET 30"
+  },
+  {
+    "supplier_id":"SUP-030",
+    "supplier_name":"Evans, Green and Perkins",
+    "return_window_days":15,
+    "avg_delivery_time_days":13,
+    "on_time_delivery_pct":0.7,
+    "quality_rating":4.7,
+    "payment_terms":"NET 45"
+  }
+]
