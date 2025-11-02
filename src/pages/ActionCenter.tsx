@@ -22,7 +22,7 @@ interface ActionCenterProps {
 
 export default function ActionCenterPage({ appData }: ActionCenterProps) {
   const actionData = useActionCenter(appData);
-  const [activeTab, setActiveTab] = useState<'financial' | 'inventory'>('financial'); // New State for tabs
+  const [activeTab, setActiveTab] = useState<'financial' | 'inventory'>('financial');
 
   if (!actionData) {
     return (
@@ -79,7 +79,6 @@ export default function ActionCenterPage({ appData }: ActionCenterProps) {
 
       {/* --- TAB CONTENT --- */}
 
-      {/* FINANCIAL ALERTS Tab */}
       {activeTab === 'financial' && (
         <div className="space-y-8">
           <UrgentReturnsSection alerts={actionData.urgentReturns} totalValue={actionData.totalReturnValue} />
@@ -88,7 +87,6 @@ export default function ActionCenterPage({ appData }: ActionCenterProps) {
         </div>
       )}
 
-      {/* INVENTORY STATUS Tab (NEW) */}
       {activeTab === 'inventory' && (
         <InventoryStatusSection alerts={actionData.inventoryStatus} />
       )}
@@ -97,7 +95,7 @@ export default function ActionCenterPage({ appData }: ActionCenterProps) {
   );
 }
 
-// --- Sub-Component for Section 1: Urgent Returns (Unchanged) ---
+// --- Sub-Component for Section 1: Urgent Returns (LIGHT MODE) ---
 function UrgentReturnsSection({ alerts, totalValue }: { alerts: UrgentReturnAlert[], totalValue: number }) {
   return (
     <div className="rounded-lg bg-white shadow-md">
@@ -154,7 +152,7 @@ function UrgentReturnsSection({ alerts, totalValue }: { alerts: UrgentReturnAler
   );
 }
 
-// --- Sub-Component for Section 2: Upcoming Payables (Unchanged) ---
+// --- Sub-Component for Section 2: Upcoming Payables (LIGHT MODE) ---
 function UpcomingPayablesSection({ alerts, totalValue }: { alerts: UpcomingPayable[], totalValue: number }) {
   return (
     <div className="rounded-lg bg-white shadow-md">
@@ -206,7 +204,7 @@ function UpcomingPayablesSection({ alerts, totalValue }: { alerts: UpcomingPayab
 }
 
 
-// --- Sub-Component for Section 3: Critical Re-orders (Unchanged) ---
+// --- Sub-Component for Section 3: Critical Re-orders (LIGHT MODE) ---
 function CriticalReordersSection({ alerts }: { alerts: ReorderAlert[] }) {
   return (
     <div className="rounded-lg bg-white shadow-md">
@@ -244,7 +242,7 @@ function CriticalReordersSection({ alerts }: { alerts: ReorderAlert[] }) {
                   <div className="text-sm text-gray-500">{alert.currentStock} units on hand</div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
-                  <div className="text-sm text-gray-900">{alert.supplierName}</div>
+                  <div className="text-sm font-medium text-gray-900">{alert.supplierName}</div>
                   <div className="text-sm text-gray-500">{alert.supplierRating.toFixed(0)}% On-Time</div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
@@ -261,19 +259,12 @@ function CriticalReordersSection({ alerts }: { alerts: ReorderAlert[] }) {
   );
 }
 
-// --- NEW Sub-Component for Inventory Status Dashboard ---
-// --- NEW Sub-Component for Inventory Status Dashboard ---
-// --- NEW Sub-Component for Inventory Status Dashboard ---
-// --- NEW Sub-Component for Inventory Status Dashboard ---
+// --- Sub-Component for Inventory Status Dashboard (LIGHT MODE) ---
 function InventoryStatusSection({ alerts }: { alerts: InventoryStatusAlert[] }) {
-    // Separate alerts based on the data provided by the hook
     const overstocked = alerts.filter(a => a.status === 'Overstocked');
     const understocked = alerts.filter(a => a.status === 'Understocked');
 
     const totalOverstockValue = overstocked.reduce((sum, a) => sum + a.value, 0);
-
-    // CRITICAL FIX: The display list should show ALL available prioritized alerts (up to 25)
-    const displayAlerts = alerts; 
 
     return (
         <div className="space-y-6">
@@ -313,8 +304,7 @@ function InventoryStatusSection({ alerts }: { alerts: InventoryStatusAlert[] }) 
             {/* Detailed Alert Table */}
             <div className="rounded-lg bg-white shadow-md">
                 <div className="border-b border-gray-200 p-6">
-                    {/* CRITICAL CHANGE: Change title to reflect the size */}
-                    <h3 className="text-xl font-semibold text-gray-800">Top {displayAlerts.length} Prioritized Inventory Alerts</h3>
+                    <h3 className="text-xl font-semibold text-gray-800">Top {alerts.length} Prioritized Inventory Alerts</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -329,7 +319,7 @@ function InventoryStatusSection({ alerts }: { alerts: InventoryStatusAlert[] }) 
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white">
-                            {displayAlerts.map((alert) => ( // Show ALL (25) prioritized alerts
+                            {alerts.map((alert) => (
                                 <tr key={alert.id}>
                                     <td className="whitespace-nowrap px-6 py-4">
                                         <span className={`rounded-full px-3 py-1 text-xs font-bold ${

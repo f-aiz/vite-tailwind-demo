@@ -160,6 +160,11 @@ function findCriticalReorders(appData: AppData, maps: MemoizedMaps): ReorderAler
 
 // --- 4. INVENTORY STATUS LOGIC (Final Logic) ---
 // --- 4. INVENTORY STATUS LOGIC (Fixed store_id access) ---
+// src/hooks/useActionCenter.ts
+
+// ... (findUrgentReturns, findUpcomingPayables, findCriticalReorders functions are all above this) ...
+
+// --- 4. INVENTORY STATUS LOGIC (Prioritizing Opportunity) ---
 export interface InventoryStatusAlert {
     id: string;
     skuId: string;
@@ -169,7 +174,7 @@ export interface InventoryStatusAlert {
     currentStock: number;
     daysOfStock: number;
     value: number;
-    reasonDelta: number;
+    reasonDelta: number; // The numerical difference from the threshold
 }
 
 function findInventoryStatus(
@@ -179,26 +184,32 @@ function findInventoryStatus(
   const alerts: InventoryStatusAlert[] = [];
   
   // NOTE: Logic thresholds
-  const SAFETY_FACTOR = 3;
-  const MIN_SAFETY_STOCK = 10;
-  const OVERSTOCK_AGE_DAYS = 60;
+  const SAFETY_FACTOR = 3; // 3x 90-day forecast is the overstock limit
+  const MIN_SAFETY_STOCK = 10; // Understock limit
+  const OVERSTOCK_AGE_DAYS = 60; // Age threshold for overstock risk
 
   for (const inv of appData.inventory) {
-      const forecast = maps.forecast90.get(`${inv.store_id}-${inv.sku_id}`); // Correct access
+      const forecast = maps.forecast90.get(`${inv.store_id}-${inv.sku_id}`);
       const sku = maps.sku.get(inv.sku_id);
       
       if (!sku || !forecast) continue;
 
       const costValue = inv.quantity_on_hand * sku.cost_price;
 
-      // --- Overstocking (RISK) ---
+      // --- Logic for Overstocking (RISK) ---
       const overstockThreshold = forecast.predicted_demand * SAFETY_FACTOR;
       if (inv.quantity_on_hand > overstockThreshold && inv.days_in_stock > OVERSTOCK_AGE_DAYS) {
           const reasonDelta = inv.quantity_on_hand - overstockThreshold;
           alerts.push({
-              id: `${inv.store_id}-${inv.sku_id}-OS`, skuId: sku.sku_id, productName: sku.product_name, storeId: inv.store_id, // <-- FIX APPLIED
-              status: 'Overstocked', currentStock: inv.quantity_on_hand, daysOfStock: inv.days_in_stock,
-              value: costValue, reasonDelta: Math.floor(reasonDelta),
+              id: `${inv.store_id}-${inv.sku_id}-OS`,
+              skuId: sku.sku_id,
+              productName: sku.product_name,
+              storeId: inv.store_id,
+              status: 'Overstocked',
+              currentStock: inv.quantity_on_hand,
+              daysOfStock: inv.days_in_stock,
+              value: costValue,
+              reasonDelta: Math.floor(reasonDelta),
           });
       }
       
@@ -206,32 +217,51 @@ function findInventoryStatus(
       if (inv.quantity_on_hand < MIN_SAFETY_STOCK && forecast.predicted_demand > 100) {
           const reasonDelta = MIN_SAFETY_STOCK - inv.quantity_on_hand; 
           alerts.push({
-              id: `${inv.store_id}-${inv.sku_id}-US`, skuId: sku.sku_id, productName: sku.product_name, storeId: inv.store_id, // <-- FIX APPLIED
-              status: 'Understocked', currentStock: inv.quantity_on_hand, daysOfStock: inv.days_in_stock,
-              value: costValue, reasonDelta: Math.floor(reasonDelta),
+              id: `${inv.store_id}-${inv.sku_id}-US`,
+              skuId: sku.sku_id,
+              productName: sku.product_name,
+              storeId: inv.store_id,
+              status: 'Understocked',
+              currentStock: inv.quantity_on_hand,
+              daysOfStock: inv.days_in_stock,
+              value: costValue,
+              reasonDelta: Math.floor(reasonDelta),
           });
       }
   }
   
-  // 1. Sort by priority: Overstocked (Risk) first, then Understocked (Opportunity)
+  // --- NEW SORTING LOGIC ---
+  // 1. Group Understocked first, then Overstocked.
+  // 2. Understocked: Sort by highest Value (biggest missed opportunity).
+  // 3. Overstocked: Sort by highest Days in Stock (most urgent risk).
   const sortedAlerts = alerts.sort((a, b) => {
-      if (a.status === 'Overstocked' && b.status === 'Understocked') return -1;
-      if (a.status === 'Understocked' && b.status === 'Overstocked') return 1;
+      // 1. Grouping: Understocked (Opportunity) comes FIRST
+      if (a.status === 'Understocked' && b.status === 'Overstocked') return -1;
+      if (a.status === 'Overstocked' && b.status === 'Understocked') return 1;
       
-      if (a.status === 'Overstocked') return b.daysOfStock - a.daysOfStock;
-      return b.value - a.value;
-  });
+      // 2. Sorting within Understocked group
+      if (a.status === 'Understocked') {
+          return b.value - a.value; // Highest value opportunity first
+      }
 
-  // 2. Sample the list for the final display
-  const overstocked = sortedAlerts.filter(a => a.status === 'Overstocked').slice(0, 18);
-  const understocked = sortedAlerts.filter(a => a.status === 'Understocked').slice(0, 7);
-
-  // Return the merged list
-  return [...overstocked, ...understocked].sort((a, b) => {
-      if (a.status === 'Overstocked' && b.status === 'Understocked') return -1;
+      // 3. Sorting within Overstocked group
+      if (a.status === 'Overstocked') {
+          return b.daysOfStock - a.daysOfStock; // Oldest risk first
+      }
       return 0;
   });
+  
+  // 4. Apply the Demo Cap
+  // We take the top 7 Understocked and top 18 Overstocked from the fully sorted list.
+  const understocked = sortedAlerts.filter(a => a.status === 'Understocked').slice(0, 7);
+  const overstocked = sortedAlerts.filter(a => a.status === 'Overstocked').slice(0, 18);
+
+  // 5. Return the merged list
+  // The final sort ensures Understocked items appear first in the table.
+  return [...understocked, ...overstocked];
 }
+
+// ... (rest of the file remains the same) ...
 
 // ----------------------------------------------------------------------
 // --- THE MAIN HOOK (Exported) ---

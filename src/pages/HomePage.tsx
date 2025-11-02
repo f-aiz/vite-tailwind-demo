@@ -1,16 +1,18 @@
 // src/pages/HomePage.tsx
 
+import { useState } from 'react';
 import type { AppData } from '../lib/types';
 import { useHomeDashboard, type StoreHealth} from '../hooks/useHomeDashboard';
-import SalesTrendWidget from '../components/dashboard/SalesTrendWidget'; // <-- NEW IMPORT
+import SalesTrendWidget from '../components/dashboard/SalesTrendWidget';
+import InventoryBreakdownModal from '../components/dashboard/InventoryBreakdownModal';
+import CreditHealthModal from '../components/dashboard/CreditHealthModal';
 import {
   ArchiveBoxIcon,
   BanknotesIcon,
   BuildingStorefrontIcon,
   ArchiveBoxArrowDownIcon,
-  CreditCardIcon// Added this icon just in case
+  CreditCardIcon
 } from '@heroicons/react/24/outline';
-
 
 // --- Reusable Utility ---
 const formatCurrency = (value: number) => {
@@ -28,6 +30,9 @@ interface HomeProps {
 
 export default function HomePage({ appData }: HomeProps) {
   const dashboardData = useHomeDashboard(appData);
+  
+  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
+  const [isCreditModalOpen, setIsCreditModalOpen] = useState(false);
 
   if (!dashboardData) {
     return <div>Loading Dashboard...</div>;
@@ -41,13 +46,16 @@ export default function HomePage({ appData }: HomeProps) {
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Capital Allocation</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          
           <KpiCard
             title="Total Inventory Value"
             value={formatCurrency(kpis.totalInventoryValue)}
             subtitle="Total cost of stock you are sitting on."
             icon={BuildingStorefrontIcon}
             color="indigo"
+            onClick={() => setIsInventoryModalOpen(true)}
           />
+          
           <KpiCard
             title="At-Risk (Liquidable) Stock"
             value={formatCurrency(kpis.liquidatableValue)}
@@ -61,11 +69,12 @@ export default function HomePage({ appData }: HomeProps) {
             subtitle="Cash you owe to suppliers."
             icon={CreditCardIcon}
             color="amber"
+            onClick={() => setIsCreditModalOpen(true)}
           />
         </div>
       </div>
 
-      {/* 2. NEW: Sales Trend Widget Integration */}
+      {/* 2. Sales Trend Widget Integration */}
       <SalesTrendWidget appData={appData} />
       
       {/* 3. Store Health Cards Grid */}
@@ -77,26 +86,46 @@ export default function HomePage({ appData }: HomeProps) {
           ))}
         </div>
       </div>
+
+      {/* --- RENDER BOTH MODALS --- */}
+      <InventoryBreakdownModal 
+        isOpen={isInventoryModalOpen}
+        onClose={() => setIsInventoryModalOpen(false)}
+        breakdownData={kpis.storeBreakdown}
+        totalValue={kpis.totalInventoryValue}
+        storeHealthData={storeHealthCards}
+      />
+      <CreditHealthModal
+        isOpen={isCreditModalOpen}
+        onClose={() => setIsCreditModalOpen(false)}
+        kpis={kpis}
+      />
     </div>
   );
 }
 
-// --- Reusable KPI Card Component (Unchanged) ---
-function KpiCard({ title, value, subtitle, icon: Icon, color }: {
+// --- Reusable KPI Card Component (Clickable) ---
+function KpiCard({ title, value, subtitle, icon: Icon, color, onClick }: {
   title: string;
   value: string;
   subtitle: string;
   icon: React.ComponentType<{ className?: string }>;
   color: 'indigo' | 'green' | 'amber';
+  onClick?: () => void;
 }) {
   const colorClasses = {
     indigo: 'bg-indigo-100 text-indigo-600',
     green: 'bg-green-100 text-green-600',
     amber: 'bg-amber-100 text-amber-600',
   };
+  
+  const isClickable = !!onClick;
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-md">
+    <div 
+      onClick={onClick}
+      className={`rounded-lg bg-white p-6 shadow-md ${isClickable ? 'cursor-pointer transition hover:shadow-lg hover:ring-2 hover:ring-indigo-500' : ''}`}
+    >
       <div className="flex items-start gap-x-4">
         <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full ${colorClasses[color]}`}>
           <Icon className="h-7 w-7" />
@@ -105,6 +134,9 @@ function KpiCard({ title, value, subtitle, icon: Icon, color }: {
           <p className="text-sm font-medium text-gray-500">{title}</p>
           <p className="mt-1 text-3xl font-bold tracking-tight text-gray-900">{value}</p>
           <p className="mt-1 text-sm text-gray-600">{subtitle}</p>
+          {isClickable && (
+             <p className="mt-2 text-sm font-semibold text-indigo-600">View analysis &rarr;</p>
+          )}
         </div>
       </div>
     </div>
@@ -112,7 +144,7 @@ function KpiCard({ title, value, subtitle, icon: Icon, color }: {
 }
 
 
-// --- Sub-Component for the Store Cards (Unchanged) ---
+// --- Sub-Component for the Store Cards ---
 function StoreCard({ store }: { store: StoreHealth }) {
   const tierColor = {
     A: 'text-green-700 bg-green-100 border-green-300',
@@ -122,7 +154,6 @@ function StoreCard({ store }: { store: StoreHealth }) {
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
-      {/* Card Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold text-gray-900">{store.storeName}</h3>
         <span 
@@ -133,10 +164,7 @@ function StoreCard({ store }: { store: StoreHealth }) {
       </div>
       <p className="text-sm text-gray-500">{store.storeId}</p>
 
-      {/* Card Body - Stats (Styled flex layout) */}
       <div className="mt-6 space-y-5">
-        
-        {/* Stat 1: Avg. Stock Age */}
         <div className="flex items-start gap-x-4">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
             <ArchiveBoxIcon className="h-6 w-6" />
@@ -148,10 +176,7 @@ function StoreCard({ store }: { store: StoreHealth }) {
             </p>
           </div>
         </div>
-        
         <hr className="border-gray-100" />
-
-        {/* Stat 2: 8-Month Revenue */}
         <div className="flex items-start gap-x-4">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
             <BanknotesIcon className="h-6 w-6" />

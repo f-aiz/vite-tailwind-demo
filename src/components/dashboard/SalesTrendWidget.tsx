@@ -46,7 +46,6 @@ interface ChartDataEntry {
 // --- FINAL DATA PREP FUNCTION (FIXED) ---
 const prepareChartData = (horizon: ForecastHorizon) => {
     const fullData = [...historicalData];
-    const lastActualValue = historicalData[historicalData.length - 1].value;
 
     // 1. Convert historical data to the final ChartDataEntry format
     const data: ChartDataEntry[] = fullData.map(d => ({ month: d.month, Historical: d.value, Forecast: null }));

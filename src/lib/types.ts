@@ -109,3 +109,9 @@ export interface AppData {
   sales: SaleTransaction[];
   forecasts: DemandForecast[];
 }
+
+export interface PurchasePlan {
+  safetyStock: number;
+  reorderPoint: number;
+  orderQuantity: number;
+}
