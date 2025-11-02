@@ -6,6 +6,7 @@ import { useStrategy, type Quadrant } from '../hooks/useStrategy';
 import {
   ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea
 } from 'recharts';
+import { Link } from 'react-router-dom'; // <-- Needed for Fix B
 
 interface StrategyProps {
   appData: AppData;
@@ -18,12 +19,19 @@ const QUADRANT_COLORS: Record<Quadrant, string> = {
   'Underperformer': '#dc2626', // red
 };
 
-// Colors for the quadrant backgrounds
 const QUADRANT_BG_COLORS: Record<Quadrant, string> = {
   'Core Performer': '#dcfce7', // green-100
   'Growth Potential': '#e0f2fe', // blue-100
   'Slow-Moving': '#fef9c3', // yellow-100
   'Underperformer': '#fee2e2', // red-100
+};
+
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
 };
 
 export default function StrategyPage({ appData }: StrategyProps) {
@@ -38,8 +46,7 @@ export default function StrategyPage({ appData }: StrategyProps) {
     );
   }
 
-  // We now get the averages from the hook
-  const { quadrantData, categories, stores, avgVelocity, avgMargin } = strategyData;
+  const { quadrantData, categories, stores, avgVelocity, avgMargin, totalUnderperformerValue } = strategyData;
 
   const filteredTableData =
     selectedQuadrant === 'ALL'
@@ -59,39 +66,47 @@ export default function StrategyPage({ appData }: StrategyProps) {
         </p>
       </header>
 
-      {/* Filter Controls */}
-      <div className="flex space-x-4 rounded-lg bg-white p-4 shadow-sm">
-        <div>
-          <label htmlFor="store" className="block text-sm font-medium text-gray-700">
-            Store
-          </label>
-          <select
-            id="store"
-            name="store"
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            value={filters.store}
-            onChange={(e) => setFilters(f => ({ ...f, store: e.target.value }))}
-          >
-            {stores.map(s => <option key={s} value={s}>{s === 'ALL' ? 'All Stores' : s}</option>)}
-          </select>
+      {/* --- 1. Filter Controls & Liquidation KPI (FIX C) --- */}
+      <div className="flex justify-between items-center rounded-lg bg-white p-4 shadow-sm">
+        <div className='flex space-x-4'>
+          {/* Store Filter */}
+          <div>
+            <label htmlFor="store" className="block text-sm font-medium text-gray-700">Store</label>
+            <select
+              id="store"
+              name="store"
+              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              value={filters.store}
+              onChange={(e) => setFilters(f => ({ ...f, store: e.target.value }))}
+            >
+              {stores.map(s => <option key={s} value={s}>{s === 'ALL' ? 'All Stores' : s}</option>)}
+            </select>
+          </div>
+          {/* Category Filter */}
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
+            <select
+              id="category"
+              name="category"
+              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              value={filters.category}
+              onChange={(e) => setFilters(f => ({ ...f, category: e.target.value }))}
+            >
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
         </div>
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-            Category
-          </label>
-          <select
-            id="category"
-            name="category"
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            value={filters.category}
-            onChange={(e) => setFilters(f => ({ ...f, category: e.target.value }))}
-          >
-            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+        
+        {/* Liquidation Value KPI */}
+        <div className='text-right'>
+            <p className="text-sm font-medium text-gray-500">Value of Underperformer Stock</p>
+            <p className="text-2xl font-bold text-red-600">
+                {formatCurrency(totalUnderperformerValue)}
+            </p>
         </div>
       </div>
 
-      {/* --- THE NEW 2x2 QUADRANT CHART --- */}
+      {/* --- 2. The 2x2 Quadrant Chart --- */}
       <div className="rounded-lg bg-white p-6 shadow-md" style={{ height: '500px' }}>
         <h3 className="text-xl font-semibold text-gray-900">Performance Quadrant</h3>
         <ResponsiveContainer width="100%" height="100%" minHeight={400}>
@@ -108,21 +123,17 @@ export default function StrategyPage({ appData }: StrategyProps) {
             }/>
             <Legend />
 
-            {/* --- 1. SHADED QUADRANT BACKGROUNDS --- */}
-            {/* Underperformer (Bottom-Left) */}
+            {/* Shaded Quadrant Backgrounds */}
             <ReferenceArea x1={0} x2={avgVelocity} y1={0} y2={avgMargin} fill={QUADRANT_BG_COLORS['Underperformer']} strokeOpacity={0.3} />
-            {/* Growth Potential (Top-Left) */}
             <ReferenceArea x1={0} x2={avgVelocity} y1={avgMargin} y2={maxMargin} fill={QUADRANT_BG_COLORS['Growth Potential']} strokeOpacity={0.3} />
-            {/* Slow-Moving (Bottom-Right) */}
             <ReferenceArea x1={avgVelocity} x2={maxVelocity} y1={0} y2={avgMargin} fill={QUADRANT_BG_COLORS['Slow-Moving']} strokeOpacity={0.3} />
-            {/* Core Performer (Top-Right) */}
             <ReferenceArea x1={avgVelocity} x2={maxVelocity} y1={avgMargin} y2={maxMargin} fill={QUADRANT_BG_COLORS['Core Performer']} strokeOpacity={0.3} />
 
-            {/* --- 2. AXIS DIVIDING LINES --- */}
+            {/* Axis Dividing Lines */}
             <ReferenceLine x={avgVelocity} stroke="black" strokeDasharray="3 3" />
             <ReferenceLine y={avgMargin} stroke="black" strokeDasharray="3 3" />
 
-            {/* --- 3. SCATTER PLOTS (drawn on top) --- */}
+            {/* SCATTER PLOTS (drawn on top) */}
             <Scatter name="Core Performer" data={quadrantData.filter(d => d.quadrant === 'Core Performer')} fill={QUADRANT_COLORS['Core Performer']} />
             <Scatter name="Growth Potential" data={quadrantData.filter(d => d.quadrant === 'Growth Potential')} fill={QUADRANT_COLORS['Growth Potential']} />
             <Scatter name="Slow-Moving" data={quadrantData.filter(d => d.quadrant === 'Slow-Moving')} fill={QUADRANT_COLORS['Slow-Moving']} />
@@ -132,10 +143,11 @@ export default function StrategyPage({ appData }: StrategyProps) {
         </ResponsiveContainer>
       </div>
 
-      {/* Filterable Data Table */}
+      {/* --- 3. Filterable Data Table --- */}
       <div className="rounded-lg bg-white shadow-md">
         <div className="border-b border-gray-200 p-6">
           <h3 className="text-xl font-semibold text-gray-900">SKU List ({filteredTableData.length} items)</h3>
+          {/* Quadrant filter buttons */}
           <div className="mt-4 flex space-x-2">
             <button onClick={() => setSelectedQuadrant('ALL')} className={`rounded-full px-3 py-1 text-sm font-medium ${selectedQuadrant === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}>All</button>
             {Object.keys(QUADRANT_COLORS).map(q => (
@@ -158,6 +170,7 @@ export default function StrategyPage({ appData }: StrategyProps) {
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Quadrant</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">90-Day Velocity</th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Margin</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
@@ -177,6 +190,12 @@ export default function StrategyPage({ appData }: StrategyProps) {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{sku.velocity.toFixed(0)} units</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{(sku.margin * 100).toFixed(1)}%</td>
+                  {/* --- FIX B: Clickable Link --- */}
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                    <Link to={`/details?search=${sku.sku_id}`} className="text-indigo-600 hover:text-indigo-900">
+                      View Details
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

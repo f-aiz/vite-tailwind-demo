@@ -2,13 +2,15 @@
 
 import type { AppData } from '../lib/types';
 import { useHomeDashboard, type StoreHealth} from '../hooks/useHomeDashboard';
+import SalesTrendWidget from '../components/dashboard/SalesTrendWidget'; // <-- NEW IMPORT
 import {
   ArchiveBoxIcon,
   BanknotesIcon,
   BuildingStorefrontIcon,
   ArchiveBoxArrowDownIcon,
-  CreditCardIcon,
+  CreditCardIcon// Added this icon just in case
 } from '@heroicons/react/24/outline';
+
 
 // --- Reusable Utility ---
 const formatCurrency = (value: number) => {
@@ -35,7 +37,7 @@ export default function HomePage({ appData }: HomeProps) {
 
   return (
     <div className="space-y-8">
-      {/* 1. NEW: Capital Allocation KPI Grid */}
+      {/* 1. Capital Allocation KPI Grid */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Capital Allocation</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -63,7 +65,10 @@ export default function HomePage({ appData }: HomeProps) {
         </div>
       </div>
 
-      {/* 2. Store Health Cards Grid (Unchanged) */}
+      {/* 2. NEW: Sales Trend Widget Integration */}
+      <SalesTrendWidget appData={appData} />
+      
+      {/* 3. Store Health Cards Grid */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">Store Health</h2>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -76,7 +81,7 @@ export default function HomePage({ appData }: HomeProps) {
   );
 }
 
-// --- NEW: Reusable KPI Card Component ---
+// --- Reusable KPI Card Component (Unchanged) ---
 function KpiCard({ title, value, subtitle, icon: Icon, color }: {
   title: string;
   value: string;
@@ -98,7 +103,7 @@ function KpiCard({ title, value, subtitle, icon: Icon, color }: {
         </div>
         <div>
           <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="text-3xl font-bold tracking-tight text-gray-900">{value}</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight text-gray-900">{value}</p>
           <p className="mt-1 text-sm text-gray-600">{subtitle}</p>
         </div>
       </div>
@@ -128,8 +133,9 @@ function StoreCard({ store }: { store: StoreHealth }) {
       </div>
       <p className="text-sm text-gray-500">{store.storeId}</p>
 
-      {/* Card Body - Stats (Simple vertical stack) */}
+      {/* Card Body - Stats (Styled flex layout) */}
       <div className="mt-6 space-y-5">
+        
         {/* Stat 1: Avg. Stock Age */}
         <div className="flex items-start gap-x-4">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
@@ -143,7 +149,6 @@ function StoreCard({ store }: { store: StoreHealth }) {
           </div>
         </div>
         
-        {/* Divider */}
         <hr className="border-gray-100" />
 
         {/* Stat 2: 8-Month Revenue */}

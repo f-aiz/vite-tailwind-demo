@@ -3,12 +3,11 @@
 import { useMemo, useState } from 'react';
 import type { AppData, SKU } from '../lib/types';
 
-// Define the 4 quadrants
 export type Quadrant = 'Core Performer' | 'Growth Potential' | 'Slow-Moving' | 'Underperformer';
 
 export interface QuadrantSKU extends SKU {
   velocity: number; // 90-day sales
-  margin: number;   // Already on SKU
+  margin: number;
   quadrant: Quadrant;
 }
 
@@ -16,23 +15,19 @@ export interface StrategyData {
   quadrantData: QuadrantSKU[];
   categories: string[];
   stores: string[];
-  // --- ADD THESE LINES ---
   avgVelocity: number;
   avgMargin: number;
-  // ---
+  totalUnderperformerValue: number; 
 }
 
 // --- Helper Functions ---
-function getQuadrant(velocity: number, margin: number, vAvg: number, mAvg: number): Quadrant {
-  if (velocity >= vAvg && margin >= mAvg) return 'Core Performer';
-  if (velocity < vAvg && margin >= mAvg) return 'Growth Potential';
-  if (velocity >= vAvg && margin < mAvg) return 'Slow-Moving';
-  return 'Underperformer';
-}
 
-// --- Hard-coded demo data function ---
+// --- 1. HARDCODED DEMO DATA FUNCTION (Guaranteed points) ---
+// This ensures the graph is never empty or flat.
 const createDemoData = (skus: SKU[]): QuadrantSKU[] => {
   if (skus.length < 12) return []; 
+  
+  // We use SKUs 0-11 for the points.
   return [
     { ...skus[0], velocity: 120, margin: 0.55, quadrant: 'Core Performer' },
     { ...skus[1], velocity: 130, margin: 0.65, quadrant: 'Core Performer' },
@@ -55,41 +50,48 @@ export function useStrategy(appData: AppData | null) {
     store: 'ALL',
     category: 'ALL',
   });
-  
-  const strategyData: StrategyData | null = useMemo(() => {
-    if (!appData) {
-      console.log('useStrategy (useMemo): No appData, returning null.');
-      return null;
-    }
 
-    console.log('useStrategy (useMemo): AppData exists, SIMULATING data.');
-    
-    // Get filter options (fast)
+  const strategyData: StrategyData | null = useMemo(() => {
+    if (!appData) return null;
+
+    // 1. Get filter options
     const stores = ['ALL', ...appData.stores.map(s => s.store_id)];
     const categories = ['ALL', ...Array.from(new Set(appData.skus.map(s => s.category)))];
 
-    // Get hard-coded quadrant data (fast)
-    const quadrantData = createDemoData(appData.skus);
+    // 2. Use HARDCODED data for the graph (fast and guaranteed)
+    let quadrantData = createDemoData(appData.skus);
+    
+    // 3. Apply Filters to the demo data
+    if (filters.category !== 'ALL') {
+      quadrantData = quadrantData.filter(d => d.category === filters.category);
+    }
+    // Note: We ignore the store filter here to keep the graph stable.
 
-    // --- ADD THIS LOGIC ---
-    // Calculate averages from the demo data so we can draw the lines
+    // 4. Calculate Averages
+    if (quadrantData.length === 0) {
+       return { quadrantData: [], categories, stores, avgVelocity: 0, avgMargin: 0, totalUnderperformerValue: 0 };
+    }
+    
     const totalVelocity = quadrantData.reduce((sum, s) => sum + s.velocity, 0);
     const totalMargin = quadrantData.reduce((sum, s) => sum + s.margin, 0);
     const avgVelocity = totalVelocity / quadrantData.length;
     const avgMargin = totalMargin / quadrantData.length;
-    // ---
-
-    // Return the final object
+    
+    // 5. Calculate Liquidation Value (Simplified for simulation)
+    const totalUnderperformerValue = quadrantData
+      .filter(d => d.quadrant === 'Underperformer')
+      .reduce((sum, sku) => sum + (sku.cost_price * 5), 0); // Simulate 5 units of stock per underperformer SKU
+    
     return {
       quadrantData,
       categories,
       stores,
-      // --- ADD THESE LINES ---
       avgVelocity,
       avgMargin,
+      totalUnderperformerValue,
     };
 
-  }, [appData, filters]); // Note: Filters won't change this demo data
+  }, [appData, filters]);
 
   return { strategyData, filters, setFilters };
 }

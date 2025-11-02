@@ -44,6 +44,8 @@ function App() {
       
       {/* 2. The Page Content (Dynamic) */}
       <main className="flex-1 overflow-y-auto p-8">
+        {/* --- RED BOX TEST --- */}
+  
         <Routes>
           {/* We pass the appData prop to every page that needs it */}
           <Route path="/" element={<HomePage appData={appData} />} />
